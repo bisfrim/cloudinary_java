@@ -101,6 +101,4 @@ abstract public class AbstractSearchTest extends MockableTest {
 
         assertEquals(0, resources.size());
     }
-
-
 }
