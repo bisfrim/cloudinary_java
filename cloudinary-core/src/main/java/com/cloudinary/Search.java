@@ -2,21 +2,24 @@ package com.cloudinary;
 
 import com.cloudinary.api.ApiResponse;
 import com.cloudinary.utils.ObjectUtils;
-import org.cloudinary.json.JSONArray;
-import org.cloudinary.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Search {
 
-    private JSONObject params;
+    private ArrayList<HashMap<String, Object>> sortByParam;
+    private ArrayList<String> aggregateParam;
+    private ArrayList<String> includesParam;
+    private HashMap<String, Object> params;
 
     Search() {
-        this.params = new JSONObject();
-        this.params.put("sort_by", new JSONArray());
-        this.params.put("aggregate", new JSONArray());
-        this.params.put("includes", new JSONArray());
+        this.params = new HashMap<String, Object>();
+        this.sortByParam = new ArrayList<HashMap<String, Object>>();
+        this.aggregateParam = new ArrayList<String>();
+        this.includesParam = new ArrayList<String>();
     }
 
     public Search expression(String value, Object... formats) {
@@ -35,33 +38,33 @@ public class Search {
     }
 
     public Search aggregate(String field) {
-        JSONArray aggregate = this.params.getJSONArray("aggregate");
-        aggregate.put(aggregate.length(), field);
+        aggregateParam.add(field);
         return this;
     }
 
     public Search includes(String field) {
-        JSONArray includes = this.params.getJSONArray("includes");
-        includes.put(includes.length(), field);
+        includesParam.add(field);
         return this;
     }
 
     public Search sortBy(String field, String dir) {
-        JSONArray sortBy = this.params.getJSONArray("sort_by");
-        JSONObject sortBucket = new JSONObject();
+        HashMap<String, Object> sortBucket = new HashMap<String, Object>();
         sortBucket.put(field, dir);
-        sortBy.put(sortBy.length(), sortBucket);
+        sortByParam.add(sortBucket);
         return this;
     }
 
-    public JSONObject toQuery() {
-        return this.params;
+    public HashMap<String, Object> toQuery() {
+        HashMap<String, Object> queryParams = new HashMap<String, Object>(this.params);
+        queryParams.put("includes", includesParam);
+        queryParams.put("sort_by", sortByParam);
+        queryParams.put("aggregate", aggregateParam);
+        return queryParams;
     }
 
     public ApiResponse execute() throws Exception {
         Cloudinary cloudinary = new Cloudinary();
         Map<String, String> options = ObjectUtils.asMap("content_type", "json");
-        Map<String, Object> paramsAsMap = ObjectUtils.toMap(this.params);
-        return cloudinary.api().callApi(Api.HttpMethod.POST, Arrays.asList("resources", "search"), paramsAsMap, options);
+        return cloudinary.api().callApi(Api.HttpMethod.POST, Arrays.asList("resources", "search"), this.toQuery(), options);
     }
 }
