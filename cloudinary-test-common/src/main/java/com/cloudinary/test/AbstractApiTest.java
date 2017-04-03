@@ -5,6 +5,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Coordinates;
 import com.cloudinary.Transformation;
 import com.cloudinary.api.ApiResponse;
+import com.cloudinary.api.RateLimit;
 import com.cloudinary.api.exceptions.BadRequest;
 import com.cloudinary.api.exceptions.NotFound;
 import com.cloudinary.utils.ObjectUtils;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import org.cloudinary.json.JSONObject;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
@@ -264,6 +266,26 @@ abstract public class AbstractApiTest extends MockableTest {
         assertEquals(derived.size(), 0);
     }
 
+    @Test()
+    public void testDeleteDerivedByTransformation() throws Exception {
+        // should allow deleting resources
+        String public_id = "api_test_123";
+        List<Transformation> transformations = new ArrayList<Transformation>();
+        transformations.add(new Transformation().angle(90));
+        transformations.add(new Transformation().width(120));
+        cloudinary.uploader().upload(SRC_TEST_IMAGE, ObjectUtils.asMap("public_id", public_id, "tags", UPLOAD_TAGS, "eager", transformations));
+        Map resource = api.resource(public_id, ObjectUtils.emptyMap());
+        assertNotNull(resource);
+        List derived = ((List) resource.get("derived"));
+        assertTrue(derived.size() == 2);
+        api.deleteDerivedResourcesByTransformations(ObjectUtils.asArray(public_id), ObjectUtils.asArray(transformations), ObjectUtils.emptyMap());
+
+        resource = api.resource(public_id, ObjectUtils.emptyMap());
+        assertNotNull(resource);
+        derived = ((List) resource.get("derived"));
+        assertTrue(derived.size() == 0);
+    }
+
     @Test(expected = NotFound.class)
     public void test09DeleteResources() throws Exception {
         // should allow deleting resources
@@ -405,6 +427,13 @@ abstract public class AbstractApiTest extends MockableTest {
         // should support usage API call
         Map result = api.usage(ObjectUtils.emptyMap());
         assertNotNull(result.get("last_updated"));
+    }
+
+    @Test
+    public void testRateLimitWithNonEnglishLocale() throws Exception {
+        Locale.setDefault(new Locale("de", "DE"));
+        ApiResponse result = cloudinary.api().usage(new HashMap());
+        Assert.assertNotNull(result.apiRateLimit().getReset());
     }
 
     @Test
