@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -149,13 +150,14 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
             apiUri = apiUrlBuilder.build();
             request = new HttpGet(apiUri);
         } else {
+            Map<String,Object> paramsCopy =  new HashMap<String, Object>((Map<String,Object>) params);
             apiUri = apiUrlBuilder.build();
             switch (method) {
                 case PUT:
                     request = new HttpPut(apiUri);
                     break;
                 case DELETE: //uses HttpPost instead of HttpDelete
-                    ((Map<String, Object>) params).put("_method", "delete");
+                    paramsCopy.put("_method", "delete");
                     //continue with POST
                 case POST:
                     request = new HttpPost(apiUri);
@@ -164,11 +166,11 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
                     throw new IllegalArgumentException("Unknown HTTP method");
             }
             if (contentType.equals("json")) {
-                JSONObject asJSON = ObjectUtils.toJSON(params);
+                JSONObject asJSON = ObjectUtils.toJSON(paramsCopy);
                 StringEntity requestEntity = new StringEntity(asJSON.toString(), ContentType.APPLICATION_JSON);
                 ((HttpEntityEnclosingRequestBase) request).setEntity(requestEntity);
             } else {
-                ((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(prepareParams(params), Consts.UTF_8));
+                ((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(prepareParams(paramsCopy), Consts.UTF_8));
             }
         }
 
