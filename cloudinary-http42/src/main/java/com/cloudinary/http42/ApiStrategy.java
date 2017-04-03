@@ -42,7 +42,7 @@ public class ApiStrategy extends AbstractApiStrategy {
         if (apiKey == null) throw new IllegalArgumentException("Must supply api_key");
         String apiSecret = ObjectUtils.asString(options.get("api_secret"), this.api.cloudinary.config.apiSecret);
         if (apiSecret == null) throw new IllegalArgumentException("Must supply api_secret");
-        String contentType= ObjectUtils.asString(options.get("content_type"),"urlencoded");
+        String contentType = ObjectUtils.asString(options.get("content_type"), "urlencoded");
         int timeout = ObjectUtils.asInteger(options.get("timeout"), this.api.cloudinary.config.timeout);
         String apiUrl = StringUtils.join(Arrays.asList(prefix, "v1_1", cloudName), "/");
 
@@ -51,7 +51,7 @@ public class ApiStrategy extends AbstractApiStrategy {
         }
 
         URIBuilder apiUrlBuilder = new URIBuilder(apiUrl);
-        if (!contentType.equals("json")){
+        if (!contentType.equals("json")) {
             for (Map.Entry<String, ? extends Object> param : params.entrySet()) {
                 if (param.getValue() instanceof Iterable) {
                     for (String single : (Iterable<String>) param.getValue()) {
@@ -90,10 +90,10 @@ public class ApiStrategy extends AbstractApiStrategy {
         }
         request.setHeader("Authorization", "Basic " + Base64Coder.encodeString(apiKey + ":" + apiSecret));
         request.setHeader("User-Agent", Cloudinary.USER_AGENT + " ApacheHTTPComponents/4.2");
-        if (contentType.equals("json")){
+        if (contentType.equals("json")) {
             JSONObject asJSON = ObjectUtils.toJSON(params);
-            StringEntity requestEntity = new StringEntity( asJSON.toString(), ContentType.APPLICATION_JSON);
-            ((HttpEntityEnclosingRequestBase)request).setEntity(requestEntity);
+            StringEntity requestEntity = new StringEntity(asJSON.toString(), ContentType.APPLICATION_JSON);
+            ((HttpEntityEnclosingRequestBase) request).setEntity(requestEntity);
         }
 
         HttpResponse response = client.execute(request);

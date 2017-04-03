@@ -26,12 +26,12 @@ abstract public class AbstractSearchTest extends MockableTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         Cloudinary cloudinary = new Cloudinary();
-        Map options = ObjectUtils.asMap("public_id", API_TEST, "tags", new String[]{SDK_TEST_TAG,SEARCH_TAG, uniqueTag}, "context", "stage=in_review");
-        cloudinary.api().deleteResourcesByTag(SEARCH_TAG,null);
+        Map options = ObjectUtils.asMap("public_id", API_TEST, "tags", new String[]{SDK_TEST_TAG, SEARCH_TAG, uniqueTag}, "context", "stage=in_review");
+        cloudinary.api().deleteResourcesByTag(SEARCH_TAG, null);
         cloudinary.uploader().upload(SRC_TEST_IMAGE, options);
-        options = ObjectUtils.asMap("public_id", API_TEST_1, "tags", new String[]{SDK_TEST_TAG,SEARCH_TAG, uniqueTag}, "context", "stage=new");
+        options = ObjectUtils.asMap("public_id", API_TEST_1, "tags", new String[]{SDK_TEST_TAG, SEARCH_TAG, uniqueTag}, "context", "stage=new");
         cloudinary.uploader().upload(SRC_TEST_IMAGE, options);
-        options = ObjectUtils.asMap("public_id", API_TEST_2, "tags", new String[]{SDK_TEST_TAG,SEARCH_TAG, uniqueTag}, "context", "stage=validated");
+        options = ObjectUtils.asMap("public_id", API_TEST_2, "tags", new String[]{SDK_TEST_TAG, SEARCH_TAG, uniqueTag}, "context", "stage=validated");
         cloudinary.uploader().upload(SRC_TEST_IMAGE, options);
         try {
             Thread.sleep(2000); //wait for search indexing
@@ -44,8 +44,9 @@ abstract public class AbstractSearchTest extends MockableTest {
     public static void tearDownClass() throws Exception {
         Api api = MockableTest.cleanUp();
         Cloudinary cloudinary = new Cloudinary();
-        cloudinary.api().deleteResourcesByTag(SEARCH_TAG,null);
+        cloudinary.api().deleteResourcesByTag(SEARCH_TAG, null);
     }
+
     @Before
     public void setUp() {
         System.out.println("Running " + this.getClass().getName() + "." + currentTest.getMethodName());
@@ -55,55 +56,51 @@ abstract public class AbstractSearchTest extends MockableTest {
 
     @Test
     public void shouldFindResourcesByTag() throws Exception {
-        Map result = cloudinary.search().expression("tags:%s",SEARCH_TAG).execute();
+        Map result = cloudinary.search().expression("tags:%s", SEARCH_TAG).execute();
         List<Map> resources = (List<Map>) result.get("resources");
         assertEquals(3, resources.size());
     }
 
     @Test
     public void shouldFindResourceByPublicId() throws Exception {
-        Map result = cloudinary.search().expression("public_id:%s",API_TEST_1).execute();
+        Map result = cloudinary.search().expression("public_id:%s", API_TEST_1).execute();
         List<Map> resources = (List<Map>) result.get("resources");
         assertEquals(1, resources.size());
     }
 
     @Test
     public void shouldPaginateResourcesLimitedByTagAndOrderdByAscendingPublicId() throws Exception {
-        List<Map> resources ;
-        Map result = cloudinary.search().maxResults(1).expression("tags:%s",SEARCH_TAG).sortBy("public_id","asc").execute();
+        List<Map> resources;
+        Map result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc").execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(1, resources.size());
-        assertEquals(3,result.get("total_count"));
-        assertEquals(API_TEST,resources.get(0).get("public_id"));
+        assertEquals(3, result.get("total_count"));
+        assertEquals(API_TEST, resources.get(0).get("public_id"));
 
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s",SEARCH_TAG).sortBy("public_id","asc")
+        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
                 .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(1, resources.size());
-        assertEquals(3,result.get("total_count"));
-        assertEquals(API_TEST_1,resources.get(0).get("public_id"));
+        assertEquals(3, result.get("total_count"));
+        assertEquals(API_TEST_1, resources.get(0).get("public_id"));
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s",SEARCH_TAG).sortBy("public_id","asc")
+        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
                 .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(1, resources.size());
-        assertEquals(3,result.get("total_count"));
-        assertEquals(API_TEST_2,resources.get(0).get("public_id"));
+        assertEquals(3, result.get("total_count"));
+        assertEquals(API_TEST_2, resources.get(0).get("public_id"));
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s",SEARCH_TAG).sortBy("public_id","asc")
+        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
                 .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(0, resources.size());
     }
-
-
-
-
 
 
 }

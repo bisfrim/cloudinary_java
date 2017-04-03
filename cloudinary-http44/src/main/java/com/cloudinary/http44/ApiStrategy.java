@@ -126,8 +126,9 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
         }
     }
 
-   /**
+    /**
      * Prepare a request with the URL and parameters based on the HTTP method used
+     *
      * @param method the HTTP method: GET, PUT, POST, DELETE
      * @param apiUrl the cloudinary API URI
      * @param params the parameters to pass to the server
@@ -139,11 +140,11 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
         URI apiUri;
         HttpRequestBase request;
 
-        String contentType= ObjectUtils.asString(options.get("content_type"),"urlencoded");
+        String contentType = ObjectUtils.asString(options.get("content_type"), "urlencoded");
         URIBuilder apiUrlBuilder = new URIBuilder(apiUrl);
         List<NameValuePair> urlEncodedParams = prepareParams(params);
 
-        if(method == HttpMethod.GET) {
+        if (method == HttpMethod.GET) {
             apiUrlBuilder.setParameters(prepareParams(params));
             apiUri = apiUrlBuilder.build();
             request = new HttpGet(apiUri);
@@ -154,7 +155,7 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
                     request = new HttpPut(apiUri);
                     break;
                 case DELETE: //uses HttpPost instead of HttpDelete
-                    ((Map<String,Object>)params).put("_method","delete");
+                    ((Map<String, Object>) params).put("_method", "delete");
                     //continue with POST
                 case POST:
                     request = new HttpPost(apiUri);
@@ -162,11 +163,11 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
                 default:
                     throw new IllegalArgumentException("Unknown HTTP method");
             }
-            if (contentType.equals("json")){
+            if (contentType.equals("json")) {
                 JSONObject asJSON = ObjectUtils.toJSON(params);
-                StringEntity requestEntity = new StringEntity( asJSON.toString(), ContentType.APPLICATION_JSON);
+                StringEntity requestEntity = new StringEntity(asJSON.toString(), ContentType.APPLICATION_JSON);
                 ((HttpEntityEnclosingRequestBase) request).setEntity(requestEntity);
-            }else{
+            } else {
                 ((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(prepareParams(params), Consts.UTF_8));
             }
         }
