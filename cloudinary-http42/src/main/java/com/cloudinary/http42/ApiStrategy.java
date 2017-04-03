@@ -43,14 +43,13 @@ public class ApiStrategy extends AbstractApiStrategy {
         String apiSecret = ObjectUtils.asString(options.get("api_secret"), this.api.cloudinary.config.apiSecret);
         if (apiSecret == null) throw new IllegalArgumentException("Must supply api_secret");
         String contentType= ObjectUtils.asString(options.get("content_type"),"urlencoded");
-
         int timeout = ObjectUtils.asInteger(options.get("timeout"), this.api.cloudinary.config.timeout);
-
         String apiUrl = StringUtils.join(Arrays.asList(prefix, "v1_1", cloudName), "/");
+
         for (String component : uri) {
             apiUrl = apiUrl + "/" + component;
-
         }
+
         URIBuilder apiUrlBuilder = new URIBuilder(apiUrl);
         if (!contentType.equals("json")){
             for (Map.Entry<String, ? extends Object> param : params.entrySet()) {
@@ -63,6 +62,7 @@ public class ApiStrategy extends AbstractApiStrategy {
                 }
             }
         }
+
         ClientConnectionManager connectionManager = (ClientConnectionManager) this.api.cloudinary.config.properties.get("connectionManager");
 
         DefaultHttpClient client = new DefaultHttpClient(connectionManager);

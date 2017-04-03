@@ -60,7 +60,6 @@ public class Cloudinary {
         return new Search();
     }
 
-
     public static void registerUploaderStrategy(String className) {
         if (!UPLOAD_STRATEGIES.contains(className)) {
             UPLOAD_STRATEGIES.add(className);

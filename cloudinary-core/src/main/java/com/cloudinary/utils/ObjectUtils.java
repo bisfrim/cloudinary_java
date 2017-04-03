@@ -131,7 +131,6 @@ public class ObjectUtils {
         return map;
     }
 
-
     public static JSONObject toJSON(Map<String, ? extends  Object> map) throws JSONException {
         JSONObject json = new JSONObject();
         for (Map.Entry<String, ? extends  Object> entry : map.entrySet()) {
@@ -141,6 +140,7 @@ public class ObjectUtils {
         }
         return json;
     }
+
     private static Object fromJson(Object json) throws JSONException {
         if (json == JSONObject.NULL) {
             return null;

@@ -8,7 +8,6 @@ import org.cloudinary.json.JSONObject;
 import java.util.Arrays;
 import java.util.Map;
 
-
 public class Search {
 
     private JSONObject params;
@@ -65,7 +64,4 @@ public class Search {
         Map<String, Object> paramsAsMap = ObjectUtils.toMap(this.params);
         return cloudinary.api().callApi(Api.HttpMethod.POST, Arrays.asList("resources","search"),paramsAsMap,options);
     }
-
-
-
 }

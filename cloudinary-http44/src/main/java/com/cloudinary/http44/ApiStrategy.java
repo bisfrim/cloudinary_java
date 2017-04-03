@@ -174,6 +174,4 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
         setTimeouts(request, options);
         return request;
     }
-
-
 }
